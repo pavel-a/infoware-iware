@@ -17,7 +17,7 @@
 #include <winnt.h>
 #include <winternl.h>
 
-extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(_Out_ PRTL_OSVERSIONINFOW lpVersionInformation);
+//- extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(_Out_ PRTL_OSVERSIONINFOW lpVersionInformation);
 
 #ifdef _MSC_VER
 #define strtok_r(...) strtok_s(__VA_ARGS__)
@@ -26,7 +26,7 @@ extern "C" NTSYSAPI NTSTATUS NTAPI RtlGetVersion(_Out_ PRTL_OSVERSIONINFOW lpVer
 
 // Use WIM to acquire Win32_OperatingSystem.Name
 // https://msdn.microsoft.com/en-us/library/aa390423(v=vs.85).aspx
-static std::string version_name() {
+static std::string version_name_wmi() {
 	auto err = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(err == RPC_E_CHANGED_MODE)  // COM already initialised as COINIT_APARTMENTTHREADED: must pass that to bump the reference count
 		err = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -111,14 +111,52 @@ static unsigned int build_number() {
 	return token ? std::strtoul(token, nullptr, 10) : 0;
 }
 
-// Get OS version via RtlGetVersion which still works well in Windows 8 and above
+static std::string version_name_reg() {
+	HKEY hkey{};
+	iware::detail::quickscope_wrapper hkey_closer{[&]() {if(hkey) RegCloseKey(hkey);}};
+
+	if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(Software\Microsoft\Windows NT\CurrentVersion)", 0, KEY_READ, &hkey))
+		return {};
+
+	DWORD vname_size{};
+	if(RegQueryValueExA(hkey, "ProductName", nullptr, nullptr, nullptr, &vname_size))
+		return {};
+
+	std::string vname(vname_size, {});  // REG_SZ may not be NUL-terminated
+	if(RegQueryValueExA(hkey, "ProductName", nullptr, nullptr, reinterpret_cast<LPBYTE>(&vname[0]), &vname_size))
+		return {};
+	return vname;
+}
+
+// Get OS version via RtlGetVersion (ntdll) which still works well in Windows 8 and above
 // https://docs.microsoft.com/en-us/windows/win32/devnotes/rtlgetversion
 iware::system::OS_info_t iware::system::OS_info() {
+
+	// Avoid "static" linking to ntdll because it is not convenient to some of our components.
+	// Instead call GetProcAddress as ntdll should be always here.
+	NTSTATUS(NTAPI * pRtlGetVersion)(_Out_ PRTL_OSVERSIONINFOW lpVersionInformation);
+
+	HMODULE ntdllh = GetModuleHandleA("ntdll.dll");
+	if(ntdllh) {
+		// Do NOT close this handle!
+		FARPROC rgv = GetProcAddress(ntdllh, "RtlGetVersion");
+		if(rgv) {
+			std::memcpy(&pRtlGetVersion, &rgv, sizeof(rgv));
+		}
+	}
+
 	RTL_OSVERSIONINFOW os_version_info{};
 	os_version_info.dwOSVersionInfoSize = sizeof(os_version_info);
-	RtlGetVersion(&os_version_info);
+	if(pRtlGetVersion) {
+		pRtlGetVersion(&os_version_info);
+	}
 
-	return {"Windows NT", version_name(), os_version_info.dwMajorVersion, os_version_info.dwMinorVersion, os_version_info.dwBuildNumber, build_number()};
+	return {"Windows NT",
+	        os_version_info.dwMajorVersion >= 10 ? version_name_reg() : version_name_wmi(),
+	        os_version_info.dwMajorVersion,
+	        os_version_info.dwMinorVersion,
+	        os_version_info.dwBuildNumber,
+	        build_number()};
 }
 
 
