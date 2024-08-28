@@ -86,6 +86,8 @@ static std::string version_name() {
 
 static unsigned int build_number() {
 	HKEY hkey{};
+	iware::detail::quickscope_wrapper hkey_closer{[&]() { if (hkey) RegCloseKey(hkey); }};
+
 	if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(Software\Microsoft\Windows NT\CurrentVersion)", 0, KEY_READ, &hkey))
 		return {};
 
