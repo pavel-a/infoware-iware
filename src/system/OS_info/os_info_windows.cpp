@@ -161,10 +161,10 @@ iware::system::OS_info_t iware::system::OS_info() {
 			os_version_info.dwMinorVersion == 0 && 
 			os_version_info.dwBuildNumber >= 22000) {
 			// This is win11
-			os_version_info.dwMajorVersion = 11;
-			size_t pos = win_name.find("10");
+			// Keep major version = 10 to be consistent with WMI. Change only name:
+			size_t pos = win_name.find(" 10");
 			if(std::string::npos != pos) {
-				win_name[pos + 1] = '1';
+				win_name[pos + 2] = '1';
 			}
 		}
 	}
