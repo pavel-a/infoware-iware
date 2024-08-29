@@ -71,7 +71,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.99";WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.66";WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -89,7 +89,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);INFOWARE_VERSION="0.6.66"</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -108,7 +108,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.99";</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.66"</PreprocessorDefinitions>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <AdditionalIncludeDirectories>C:\WORK\source\repos\my\infoware-iware\include</AdditionalIncludeDirectories>
     </ClCompile>
@@ -127,6 +127,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <AdditionalIncludeDirectories>C:\WORK\source\repos\my\infoware-iware\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USING_V110_SDK71_;%(PreprocessorDefinitions);INFOWARE_VERSION="0.6.66"</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -138,6 +139,8 @@
     <ClCompile Include="..\src\pci.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\src\system\amounts\amounts_windows.cpp" />
     <ClCompile Include="..\src\system\displays\displays_windows.cpp" />

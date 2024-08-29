@@ -146,8 +146,26 @@ iware::system::OS_info_t iware::system::OS_info() {
 		pRtlGetVersion(&os_version_info);
 	}
 
+	std::string win_name;
+	if(os_version_info.dwMajorVersion < 10) {
+		win_name = version_name_wmi();
+	} else {
+		win_name = version_name_reg();
+		// Fix for win11:
+		if(os_version_info.dwMajorVersion == 10 && 
+			os_version_info.dwMinorVersion == 0 && 
+			os_version_info.dwBuildNumber >= 22000) {
+			// This is win11
+			os_version_info.dwMajorVersion = 11;
+			size_t pos = win_name.find("10");
+			if(std::string::npos != pos) {
+				win_name[pos + 1] = '1';
+			}
+		}
+	}
+
 	return {"Windows NT",
-	        os_version_info.dwMajorVersion >= 10 ? version_name_reg() : version_name_wmi(),
+	        win_name,
 	        os_version_info.dwMajorVersion,
 	        os_version_info.dwMinorVersion,
 	        os_version_info.dwBuildNumber,
