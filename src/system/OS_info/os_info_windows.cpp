@@ -24,7 +24,7 @@
 
 // Use WIM to acquire Win32_OperatingSystem.Name
 // https://msdn.microsoft.com/en-us/library/aa390423(v=vs.85).aspx
-static std::string version_name_wmi() {
+static std::string version_name() {
 	auto err = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 	if(err == RPC_E_CHANGED_MODE)  // COM already initialised as COINIT_APARTMENTTHREADED: must pass that to bump the reference count
 		err = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
@@ -54,7 +54,7 @@ static std::string version_name_wmi() {
 
 	IEnumWbemClassObject* query_iterator_raw;
 	wchar_t query_lang[] = L"WQL";
-	wchar_t query[]      = L"SELECT Name FROM Win32_OperatingSystem";
+	wchar_t query[]      = L"SELECT Caption FROM Win32_OperatingSystem";
 	if(FAILED(wbem_services->ExecQuery(query_lang, query, WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, nullptr, &query_iterator_raw)))
 		return {};
 	std::unique_ptr<IEnumWbemClassObject, iware::detail::release_deleter> query_iterator(query_iterator_raw);
@@ -70,21 +70,18 @@ static std::string version_name_wmi() {
 		std::unique_ptr<IWbemClassObject, iware::detail::release_deleter> value(value_raw);
 
 		VARIANT val;
-		value->Get(L"Name", 0, &val, 0, 0);
+		VariantInit(&val);
+		value->Get(L"Caption", 0, &val, 0, 0);
 		iware::detail::quickscope_wrapper val_destructor{[&] { VariantClear(&val); }};
 
 		ret = iware::detail::narrowen_bstring(val.bstrVal);
 	}
 
-	const auto sep = ret.find('|');
-	if(sep != std::string::npos)
-		ret.resize(sep);
 	return ret;
 }
 
 static unsigned int build_number() {
 	HKEY hkey{};
-	iware::detail::quickscope_wrapper hkey_closer{[&]() { if (hkey) RegCloseKey(hkey); }};
 
 	if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(Software\Microsoft\Windows NT\CurrentVersion)", 0, KEY_READ, &hkey))
 		return {};
