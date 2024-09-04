@@ -84,8 +84,6 @@ static std::string version_name_wmi() {
 
 static unsigned int build_number() {
 	HKEY hkey{};
-	iware::detail::quickscope_wrapper hkey_closer{[&]() { if (hkey) RegCloseKey(hkey); }};
-
 	if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(Software\Microsoft\Windows NT\CurrentVersion)", 0, KEY_READ, &hkey))
 		return {};
 	iware::detail::quickscope_wrapper hkey_closer{[&] { RegCloseKey(hkey); }};
@@ -112,10 +110,9 @@ static unsigned int build_number() {
 
 static std::string version_name_reg() {
 	HKEY hkey{};
-	iware::detail::quickscope_wrapper hkey_closer{[&]() {if(hkey) RegCloseKey(hkey);}};
-
 	if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(Software\Microsoft\Windows NT\CurrentVersion)", 0, KEY_READ, &hkey))
 		return {};
+	iware::detail::quickscope_wrapper hkey_closer{[&]() { RegCloseKey(hkey); }};
 
 	DWORD vname_size{};
 	if(RegQueryValueExA(hkey, "ProductName", nullptr, nullptr, nullptr, &vname_size))
@@ -139,16 +136,14 @@ iware::system::OS_info_t iware::system::OS_info() {
 			ret = reinterpret_cast<decltype(pRtlGetVersion)>(GetProcAddress(ntdllh, "RtlGetVersion"));
 		return ret;
 	}();
-
 	RTL_OSVERSIONINFOW os_version_info{};
 	os_version_info.dwOSVersionInfoSize = sizeof(os_version_info);
-	if(pRtlGetVersion) {
+	if(pRtlGetVersion)
 		pRtlGetVersion(&os_version_info);
-	}
 
 	std::string win_name;
 	if(os_version_info.dwMajorVersion < 10) {
-		win_name = version_name_wmi();
+		win_name = version_name();
 	} else {
 		win_name = version_name_reg();
 		// Fix for win11:
