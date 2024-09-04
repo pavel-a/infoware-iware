@@ -16,6 +16,12 @@
 	#else
 		#define INFOWARE_API_LINKAGE
 		#define INFOWARE_API_LINKAGE_INTERNAL
+
+	/* For static lib pull in additional Windows deps */
+	#pragma comment(lib, "wbemuuid.lib")
+	#pragma comment(lib, "version.lib")
+	//- #pragma comment(lib, "infoware.lib") /* commented out for projects that only include .h without lib */
+
 	#endif // Building a DLL vs. Static Library
 #else  // g++ / clang++
 	#define INFOWARE_API_LINKAGE __attribute__((visibility("default")))
