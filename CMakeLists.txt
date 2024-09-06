@@ -17,7 +17,7 @@ option(INFOWARE_USE_OPENCL "Add public, transitive define to infoware to use Ope
 
 option(INFOWARE_USE_X11 "Add public, transitive define to infoware to use X11 for display detection." OFF)
 
-option(INFOWARE_USE_PCIIDS    "Want PCI IDs. If false, huge database of PCI IDs and stuff in pci.hpp will not be available"      OFF)
+option(INFOWARE_USE_PCIIDS    "Want PCI IDs. If false, database of PCI IDs and functions in pci.hpp will not be available"       OFF)
 
 option(INFOWARE_EXAMPLES "Add infoware examples to the build." OFF)
 option(INFOWARE_TESTS    "Input tests for infoware."           OFF)
@@ -61,6 +61,11 @@ if(INFOWARE_USE_OPENGL AND APPLE)
 endif()
 
 file(GLOB_RECURSE infoware_source_files    LIST_DIRECTORIES false CONFIGURE_DEPENDS src/*.cpp)
+
+if(NOT INFOWARE_USE_PCIIDS)
+   list(FILTER infoware_source_files EXCLUDE REGEX ".*pci\\.cpp")
+endif()
+
 if(APPLE)
       file(GLOB_RECURSE infoware_objc_source_files LIST_DIRECTORIES FALSE CONFIGURE_DEPENDS src/*.mm)
       list(APPEND infoware_source_files ${infoware_objc_source_files})
@@ -155,9 +160,6 @@ else()
 	                    CMAKE_ARGS -DINFOWARE_PCI_DATA_DIR:PATH=${CMAKE_BINARY_DIR}/${INFOWARE_PCI_DATA_DIR})
 endif()
 add_dependencies(infoware infoware_generate_pcis)
-
-else(INFOWARE_USE_PCIIDS)
-   list(REMOVE_ITEM infoware_source_files src/pci.cpp)
 endif(INFOWARE_USE_PCIIDS)
 
 if(MSVC)
