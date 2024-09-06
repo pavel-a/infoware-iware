@@ -22,7 +22,7 @@
 #endif
 
 
-// Use WIM to acquire Win32_OperatingSystem.Name
+// Use WIM to acquire Win32_OperatingSystem.Caption (same as .Name, but ends before the '|')
 // https://msdn.microsoft.com/en-us/library/aa390423(v=vs.85).aspx
 static std::string version_name() {
 	auto err = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
