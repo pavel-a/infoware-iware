@@ -71,12 +71,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.66";WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.6-fedr"</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\WORK\source\repos\my\infoware-iware\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
@@ -89,12 +89,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);INFOWARE_VERSION="0.6.66"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.6-fedr"</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\WORK\source\repos\my\infoware-iware\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -108,9 +108,9 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.66"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.6-fedr"</PreprocessorDefinitions>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\WORK\source\repos\my\infoware-iware\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>version.lib;wbemuuid.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -126,14 +126,19 @@
     </Link>
     <ClCompile>
       <LanguageStandard>stdcpp14</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\WORK\source\repos\my\infoware-iware\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USING_V110_SDK71_;%(PreprocessorDefinitions);INFOWARE_VERSION="0.6.66"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>INFOWARE_VERSION="0.6.6-fedr"</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\cpu\architecture\architecture_windows.cpp" />
     <ClCompile Include="..\src\cpu\endianness\all.cpp" />
+    <ClCompile Include="..\src\cpu\frequency\frequency_windows.cpp" />
+    <ClCompile Include="..\src\cpu\instruction_set\instruction_set_windows.cpp" />
+    <ClCompile Include="..\src\cpu\instruction_set\instruction_set_x86.cpp" />
     <ClCompile Include="..\src\cpu\quantities_cache\quantities_cache_windows.cpp" />
+    <ClCompile Include="..\src\cpu\vendor_model_name\vendor_id_x86.cpp" />
+    <ClCompile Include="..\src\cpu\vendor_model_name\vendor_model_name_windows.cpp" />
     <ClCompile Include="..\src\detail\cpuid_windows.cpp" />
     <ClCompile Include="..\src\detail\winstring_windows.cpp" />
     <ClCompile Include="..\src\pci.cpp">
@@ -148,7 +153,11 @@
     <ClCompile Include="..\src\system\memory\memory_windows.cpp" />
     <ClCompile Include="..\src\system\OS_info\os_info_windows.cpp" />
     <ClCompile Include="..\src\version.cpp" />
-    <ClCompile Include="system.cpp" />
+    <ClCompile Include="cpu.cpp" />
+    <ClCompile Include="system.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -57,5 +57,23 @@
     <ClCompile Include="..\src\pci.cpp">
       <Filter>Lib</Filter>
     </ClCompile>
+    <ClCompile Include="cpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu\frequency\frequency_windows.cpp">
+      <Filter>Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu\instruction_set\instruction_set_windows.cpp">
+      <Filter>Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu\instruction_set\instruction_set_x86.cpp">
+      <Filter>Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu\vendor_model_name\vendor_id_x86.cpp">
+      <Filter>Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\cpu\vendor_model_name\vendor_model_name_windows.cpp">
+      <Filter>Lib</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
