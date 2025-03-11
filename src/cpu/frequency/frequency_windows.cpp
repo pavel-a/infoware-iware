@@ -13,20 +13,18 @@
 
 std::uint64_t iware::cpu::frequency() noexcept {
 	HKEY hkey;
-	if(RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)", 0, KEY_READ, &hkey)) {
-		// Fallback
-		LARGE_INTEGER freq;
-		QueryPerformanceFrequency(&freq);
-		return freq.QuadPart * 1'000;
+	if(ERROR_SUCCESS != RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)", 0, KEY_READ, &hkey)) {
+		// Fallback to QueryPerformanceFrequency is not good on modern systems. Better return 0 on error.
+		return 0;
 	}
 	iware::detail::quickscope_wrapper hkey_closer{[&] { RegCloseKey(hkey); }};
 
 	DWORD freq_mhz;
 	DWORD freq_mhz_len = sizeof(freq_mhz);
-	if(RegQueryValueExA(hkey, "~MHz", nullptr, nullptr, static_cast<LPBYTE>(static_cast<void*>(&freq_mhz)), &freq_mhz_len))
-		return {};
+	if(ERROR_SUCCESS != RegQueryValueExA(hkey, "~MHz", nullptr, nullptr, static_cast<LPBYTE>(static_cast<void*>(&freq_mhz)), &freq_mhz_len))
+		return 0;
 
-	return freq_mhz * 1'000'000;
+	return static_cast<std::uint64_t>freq_mhz * 1'000'000U;
 }
 
 
